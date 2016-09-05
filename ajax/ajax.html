@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>ajax三种异步加载方式</title>
+	<script type="text/javascript" src="http://apps.bdimg.com/libs/jquery/1.7.2/jquery.min.js"></script>
+</head>
+<body>
+	<button id="btn1">ajax get</button>
+	<div id="box1"></div>
+	<button id="btn2">ajax post</button>
+	<div id="box2"></div>
+	<button id="btn3">ajax ajax-GET</button>
+	<div id="box3"></div>
+	<button id="btn4">ajax ajax-POST</button>
+	<div id="box4"></div>
+
+	<script>
+
+		$(function() {
+
+			//jquery get请求
+			$('#btn1').click(function() {
+
+				$.get('ajaxGet.php',{'username':'admin','gender':'male','submit':'get'}, function(data) {
+					$('#box1').html(data);
+				},'html');
+			});
+
+
+			//jquery post请求
+			$('#btn2').click(function() {
+
+				$.post('ajaxPost.php',{'username':'admin','gender':'male','submit':'post'}, function(data) {
+					$('#box2').html(data);
+				},'html');
+			});
+
+
+			//AJAX get请求
+			$('#btn3').click(function() {
+
+				$.ajax({
+					url: 'ajaxGet.php',
+					type: 'get',
+					dataType: 'html',
+					data: {'username':'admin','gender':'male','submit':'ajax-GET'},
+					success:function success(data) {
+						$('#box3').html(data);
+					},
+					fail:function fail(data) {
+						alert('加载失败');
+					}
+				});
+
+			});
+
+
+			//AJAX post请求
+			$('#btn4').click(function() {
+
+				$.ajax({
+					url: 'ajaxPost.php',
+					type: 'post',
+					dataType: 'html',
+					data: {'username':'admin','gender':'male','submit':'ajax-POST'},
+					success:function success(data) {
+						$('#box4').html(data);
+					},
+					fail:function fail(data) {
+						alert('加载失败');
+					}
+				});
+
+			});
+
+
+		});
+
+
+
+
+	</script>
+</body>
+</html>
