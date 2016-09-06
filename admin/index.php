@@ -77,12 +77,10 @@
                             <!-- <dd><a href="./add.php"><input type="button" value="添&nbsp;&nbsp;加" class="add"></a></dd> -->
                             <dd><a href="./add.php">添&nbsp;&nbsp;加</a></dd>
                         </dl>
-
                     </li>
                 </ul>
             </div>
         </div>
-
     </div>
 </body>
 <script type="text/javascript">
@@ -91,7 +89,7 @@
       window.location="edit.php?id="+id;
     }
 
-    //ajax异步删除
+    /*//ajax异步删除 $.get方式
     function del(id) {
         if (window.confirm('确定删除id为'+id+'产品？')) {
             var url = 'del.php';
@@ -105,6 +103,31 @@
             };
             $.get(url,data,success,'json');
         }
+    }*/
+
+    //ajax异步删除 ajax get方式
+    function del(id) {
+        if (window.confirm('确定删除id为'+id+'产品？')) {
+            var url     =  'del.php';
+            var type    = 'get';
+            var data    = {'id': id};
+            var dataType= 'json';
+            var success = function(response) {
+                    if (response.errno ==0 ) {
+                        // $(obj).parents("tr").remove();
+                        // $('#del_'+id).parent().parent().remove();
+                        $('#del_'+id).parents("tr").remove();
+                    }
+                };
+            var error   = function(response) {
+                    if (response.errno ==-1 ) {
+                        alert('删除失败');
+                    }
+                };
+
+            $.ajax({url,type,data,dataType,success,error});
+        }
+
     }
 
     //ajax异步加载 $.get()方法
