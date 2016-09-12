@@ -38,7 +38,7 @@
         <div class="main">
             <!--右侧内容-->
             <div class="cont">
-                <div class="title">管理</div>
+                <div class="title"><a href="./index.php" class="icon icon_i">首页</a></div>
                 <div class="details">
                    <!--  <div class="details_operation clearfix">
                         <div class="bui_select">
@@ -76,6 +76,9 @@
                         <dl>
                             <!-- <dd><a href="./add.php"><input type="button" value="添&nbsp;&nbsp;加" class="add"></a></dd> -->
                             <dd><a href="./add.php">添&nbsp;&nbsp;加</a></dd>
+                        </dl>
+                        <dl>
+                            <dd><a href="./listPage.php">带分页列表</a></dd>
                         </dl>
                     </li>
                 </ul>

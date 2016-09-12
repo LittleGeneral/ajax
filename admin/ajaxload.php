@@ -1,6 +1,6 @@
 <?php
+// http://app.com/list.php?page=1&pagesize=12
 require_once('./db.php');
-
 $connect = Db::getInstance()->connect();
 
 $page = isset($_GET['page']) ? $_GET['page'] : 1;

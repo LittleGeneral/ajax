@@ -1,30 +1,21 @@
 <?php
 require_once('./db.php');
+require_once('./pagefun.php');
 
-// http://app.com/list.php?page=1&pagesize=12
+//获取每页显示数量
+$pageSize = isset($_GET['pagesize']) ? $_GET['pagesize'] : 5;
 
 $connect = Db::getInstance()->connect();
-
-$page = isset($_GET['page']) ? $_GET['page'] : 1;
-$pageSize = isset($_GET['pagesize']) ? $_GET['pagesize'] : 4;
-
-// $pageCount =
-
-if(!is_numeric($page) || !is_numeric($pageSize)) {
-    return Response::show(401, '数据不合法');
-}
-
-$offset = ($page - 1) * $pageSize;
-
-// $sql = "select * from video";
-// $sql = "select * from video where status = 1 order by orderby desc limit ". $offset ." , ".$pageSize;
-$sql = "select * from video where status = 1 order by id desc limit ". $offset ." , ".$pageSize;
-
+$sql = "select * from video";
 $result = mysql_query($sql, $connect);
-while($video = mysql_fetch_assoc($result)) {
-        $videos[] = $video;
-    }
- ?>
+$total=mysql_num_rows($result);    //取得信息总数
+pageDivide($total,$pageSize);     //调用分页函数
+$result=mysql_query("select * from video limit $offset,$pageSize");
+
+while($row=mysql_fetch_assoc($result)){
+    $videos[] = $row;
+}
+?>
 
 <!doctype html>
 <html>
@@ -114,6 +105,11 @@ while($video = mysql_fetch_assoc($result)) {
                               <?php  endforeach;?>
                         </tbody>
                     </table>
+                </div>
+                <div style="text-align:center">
+                    <?php
+                        echo $pageList;    //输出分页导航内容
+                     ?>
                 </div>
             </div>
         </div>

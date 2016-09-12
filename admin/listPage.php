@@ -1,30 +1,21 @@
 <?php
 require_once('./db.php');
+require_once('./pagefun.php');
 
-// http://app.com/list.php?page=1&pagesize=12
+//获取每页显示数量
+$pageSize = isset($_GET['pagesize']) ? $_GET['pagesize'] : 5;
 
 $connect = Db::getInstance()->connect();
-
-$page = isset($_GET['page']) ? $_GET['page'] : 1;
-$pageSize = isset($_GET['pagesize']) ? $_GET['pagesize'] : 4;
-
-// $pageCount =
-
-if(!is_numeric($page) || !is_numeric($pageSize)) {
-    return Response::show(401, '数据不合法');
-}
-
-$offset = ($page - 1) * $pageSize;
-
-// $sql = "select * from video";
-// $sql = "select * from video where status = 1 order by orderby desc limit ". $offset ." , ".$pageSize;
-$sql = "select * from video where status = 1 order by id desc limit ". $offset ." , ".$pageSize;
-
+$sql = "select * from video";
 $result = mysql_query($sql, $connect);
-while($video = mysql_fetch_assoc($result)) {
-        $videos[] = $video;
-    }
- ?>
+$total=mysql_num_rows($result);    //取得信息总数
+pageDivide($total,$pageSize);     //调用分页函数
+$result=mysql_query("select * from video limit $offset,$pageSize");
+
+while($row=mysql_fetch_assoc($result)){
+    $videos[] = $row;
+}
+?>
 
 <!doctype html>
 <html>
@@ -65,7 +56,7 @@ while($video = mysql_fetch_assoc($result)) {
         <div class="main">
             <!--右侧内容-->
             <div class="cont">
-                <div class="title">管理</div>
+                <div class="title"><a href="./index.php" class="icon icon_i">首页</a></div>
                 <div class="details">
                     <div class="details_operation clearfix">
                         <div class="bui_select">
@@ -79,9 +70,6 @@ while($video = mysql_fetch_assoc($result)) {
                                 <th width="2%">编号</th>
                                 <th width="10%">产品名称</th>
                                 <th width="15%">图片</th>
-                                <th width="5%">折扣</th>
-                                <th width="10%">来源</th>
-                                <th width="10%">标签</th>
                                 <th width="10%">状态</th>
                                 <th width="30%">描述</th>
                                 <th>操作</th>
@@ -97,9 +85,6 @@ while($video = mysql_fetch_assoc($result)) {
                                         <label for="c1" class="label"><?php echo $video['id'];?></label></td>
                                     <td><?php echo $video['name'];?></td>
                                     <td><img width="100" height="100" src="<?php echo $video['img'];?>" alt=""/></td>
-                                    <td><?php echo $video['discount'];?></td>
-                                    <td><?php echo $video['source'];?></td>
-                                    <td><?php echo $video['tag'];?></td>
                                     <td><?php echo $video['status'];?></td>
                                     <td><?php echo $video['description'];?></td>
                                     <td align="center">
@@ -115,6 +100,11 @@ while($video = mysql_fetch_assoc($result)) {
                         </tbody>
                     </table>
                 </div>
+                <div style="text-align:center">
+                    <?php
+                        echo $pageList;    //输出分页导航内容
+                     ?>
+                </div>
             </div>
         </div>
 
@@ -127,7 +117,15 @@ while($video = mysql_fetch_assoc($result)) {
                      <li>
                         <h3><span>-</span>管理</h3>
                         <dl>
-                            <dd><a href="#">产品列表</a></dd>
+                            <!-- <dd><a href="javascript:ajaxload()">ajax异步加载</a></dd> -->
+                            <dd><a href="javascript:void(0)" onclick="ajaxload()">ajax异步加载列表</a></dd>
+                        </dl>
+                        <dl>
+                            <!-- <dd><a href="./add.php"><input type="button" value="添&nbsp;&nbsp;加" class="add"></a></dd> -->
+                            <dd><a href="./add.php">添&nbsp;&nbsp;加</a></dd>
+                        </dl>
+                        <dl>
+                            <dd><a href="./listPage.php">带分页列表</a></dd>
                         </dl>
                     </li>
                 </ul>
