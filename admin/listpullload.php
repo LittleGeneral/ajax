@@ -1,21 +1,24 @@
 <?php
 require_once('./db.php');
-require_once('./pagefun.php');
-
-//获取每页显示数量
-$pageSize = isset($_GET['pagesize']) ? $_GET['pagesize'] : 5;
-
+// http://app.com/list.php?page=1&pagesize=12
 $connect = Db::getInstance()->connect();
-$sql = "select * from video";
-$result = mysql_query($sql, $connect);
-$total=mysql_num_rows($result);    //取得信息总数
-pageDivide($total,$pageSize);     //调用分页函数
-$result=mysql_query("select * from video limit $offset,$pageSize");
 
-while($row=mysql_fetch_assoc($result)){
-    $videos[] = $row;
+$page = isset($_GET['page']) ? $_GET['page'] : 1;
+$pageSize = isset($_GET['pagesize']) ? $_GET['pagesize'] : 7;
+
+if(!is_numeric($page) || !is_numeric($pageSize)) {
+    return Response::show(401, '数据不合法');
 }
-?>
+
+$offset = ($page - 1) * $pageSize;
+
+$sql = "select * from video where status = 1 order by id desc limit ". $offset ." , ".$pageSize;
+
+$result = mysql_query($sql, $connect);
+while($video = mysql_fetch_assoc($result)) {
+        $videos[] = $video;
+    }
+ ?>
 
 <!doctype html>
 <html>
@@ -59,9 +62,9 @@ while($row=mysql_fetch_assoc($result)){
                 <div class="title">管理</div>
                 <div class="details">
                     <div class="details_operation clearfix">
-                        <div class="bui_select">
+                        <!-- <div class="bui_select">
                             <a href="./add.php"><input type="button" value="添&nbsp;&nbsp;加" class="add"></a>
-                        </div>
+                        </div> -->
                     </div>
                     <!--表格-->
                     <table class="table" cellspacing="0" cellpadding="0">
@@ -70,47 +73,29 @@ while($row=mysql_fetch_assoc($result)){
                                 <th width="2%">编号</th>
                                 <th width="10%">产品名称</th>
                                 <th width="15%">图片</th>
-                                <th width="5%">折扣</th>
-                                <th width="10%">来源</th>
-                                <th width="10%">标签</th>
                                 <th width="10%">状态</th>
                                 <th width="30%">描述</th>
-                                <th>操作</th>
                             </tr>
                         </thead>
-                        <tbody>
-
-                            <?php
+                        <tbody id="tbody">
+                             <?php
                                 foreach ($videos as $video):?>
-
                                 <tr>
                                     <td>
                                         <label for="c1" class="label"><?php echo $video['id'];?></label></td>
                                     <td><?php echo $video['name'];?></td>
                                     <td><img width="100" height="100" src="<?php echo $video['img'];?>" alt=""/></td>
-                                    <td><?php echo $video['discount'];?></td>
-                                    <td><?php echo $video['source'];?></td>
-                                    <td><?php echo $video['tag'];?></td>
                                     <td><?php echo $video['status'];?></td>
                                     <td><?php echo $video['description'];?></td>
-                                    <td align="center">
-
-                                     <input type="button" value="修改" class="btn" onclick="edit(<?php echo $video['id'];?>)">
-                                     <br><br>
-                                     <input type="button" value="删除" class="btn" id="del_<?php echo $video['id'];?>" onclick="del(<?php echo $video['id'];?>)">
-                                     <!-- <a href="javascript:del(<?php echo $video['id'];?>)" id="del">删除</a> -->
-                                      <!-- <a href="javascript:void(0)" onclick="del(<?php echo $video['id'];?>)" id="del">删除</a> -->
-                                     </td>
                                 </tr>
                               <?php  endforeach;?>
                         </tbody>
                     </table>
                 </div>
-                <div style="text-align:center">
-                    <?php
-                        echo $pageList;//输出分页导航内容
-                     ?>
-                </div>
+                <div class="nodata"></div>
+                <!-- <div style="text-align:center">
+                    <button><a href="javascript:void(0)" onclick="ajaxload()">ajax异步加载列表</a></button>
+                </div> -->
             </div>
         </div>
 
@@ -133,30 +118,36 @@ while($row=mysql_fetch_assoc($result)){
 </body>
 
 <script type="text/javascript">
-
-    function edit(id){
-            window.location="edit.php?id="+id;
-    }
-    // function del(id){
-    //         if(window.confirm("您确定要删除吗？删除之后不可以恢复哦！！！")){
-    //             window.location="del.php?id="+id;
-    //         }
-    // }
-
-    //ajax异步删除
-    function del(id) {
-        if (window.confirm('确定删除id为'+id+'产品？')) {
-            var url = 'del.php';
-            var data = {'id':id};
-            var success = function (response) {
-                if (response.errno == 0) {
-                    $('#del_'+id).parent().parent().remove();
-                    // window.loction.reload();
+    //ajax下拉异步刷新加载
+     $(function(){
+          var winH = $(window).height(); //页面可视区域高度
+          var i = 2; //设置当前页数
+          $(window).scroll(function () {
+            var pageH = $(document.body).height();
+            var scrollT = $(window).scrollTop(); //滚动条top
+            var aa = (pageH-winH-scrollT)/winH;
+            if(aa<0.02){
+              $.getJSON("ajaxpullload.php",{page:i},function(data){
+                if(data){
+                  var str = "";
+                  $.each(data,function(index,n){
+                        str+="<tr><td>"
+                            +n.id+"</td><td>"
+                            +n.name+"</td><td><img width='100' height='100' src="
+                            +n.img+"></td><td>"
+                            +n.status+"</td><td>"
+                            +n.description+"</td></tr>";
+                        $("#tbody").append(str);
+                  })
+                  i++;
+                }else{
+                  $(".nodata").html("别滚动了，已经到底了。。。");
+                  return false;
                 }
-            };
-            $.get(url,data,success,'json');
-        }
-    }
+              });
+            }
+          });
+    });
 
 </script>
 </html>
