@@ -127,6 +127,9 @@ while($row=mysql_fetch_assoc($result)){
                         <dl>
                             <dd><a href="./listPage.php">带分页列表</a></dd>
                         </dl>
+                        <dl>
+                            <dd><a href="./listpullload.php">下拉无刷新列表</a></dd>
+                        </dl>
                     </li>
                 </ul>
             </div>

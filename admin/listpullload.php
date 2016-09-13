@@ -59,7 +59,7 @@ while($video = mysql_fetch_assoc($result)) {
         <div class="main">
             <!--右侧内容-->
             <div class="cont">
-                <div class="title">管理</div>
+                <div class="title"><a href="./index.php" class="icon icon_i">首页</a></div>
                 <div class="details">
                     <div class="details_operation clearfix">
                         <!-- <div class="bui_select">
@@ -108,7 +108,18 @@ while($video = mysql_fetch_assoc($result)) {
                      <li>
                         <h3><span>-</span>管理</h3>
                         <dl>
-                            <dd><a href="#">产品列表</a></dd>
+                            <!-- <dd><a href="javascript:ajaxload()">ajax异步加载</a></dd> -->
+                            <dd><a href="javascript:void(0)" onclick="ajaxload()">ajax异步加载列表</a></dd>
+                        </dl>
+                        <dl>
+                            <!-- <dd><a href="./add.php"><input type="button" value="添&nbsp;&nbsp;加" class="add"></a></dd> -->
+                            <dd><a href="./add.php">添&nbsp;&nbsp;加</a></dd>
+                        </dl>
+                        <dl>
+                            <dd><a href="./listPage.php">带分页列表</a></dd>
+                        </dl>
+                        <dl>
+                            <dd><a href="./listpullload.php">下拉无刷新列表</a></dd>
                         </dl>
                     </li>
                 </ul>
